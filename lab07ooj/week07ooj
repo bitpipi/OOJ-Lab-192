@@ -1,0 +1,154 @@
+package CIE;
+
+public class Internals {
+    private int[] internalMarks = new int[5];
+
+
+    public Internals() {
+     
+    }
+
+   
+    public void setInternalMarks(int[] internalMarks) {
+        this.internalMarks = internalMarks;
+    }
+
+   
+    public int[] getInternalMarks() {
+        return internalMarks;
+    }
+}
+
+package CIE;
+
+public class Student {
+    public String usn;
+    public String name;
+    public int sem;
+
+   
+    public Student() {
+        this("", "", 0);
+    }
+
+
+    public Student(String usn, String name, int sem) {
+        this.usn = usn;
+        this.name = name;
+        this.sem = sem;
+    }
+
+   
+    public void setUsn(String usn) {
+        this.usn = usn;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSem(int sem) {
+        this.sem = sem;
+    }
+
+   
+    public String getUsn() {
+        return usn;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getSem() {
+        return sem;
+    }
+}
+
+package SEE;
+import CIE.Student;
+
+public class External extends Student {
+    public int[] seeMarks = new int[5];
+public External() {
+        this("", "", 0, new int[5]);
+    }
+  public External(String usn, String name, int sem, int[] seeMarks) {
+        super(usn, name, sem);
+        this.seeMarks = seeMarks;
+    }
+public void setSeeMarks(int[] seeMarks) {
+        this.seeMarks = seeMarks;
+    }
+ public int[] getSeeMarks() {
+        return seeMarks;
+    }
+}
+import CIE.Student;
+import CIE.Internals;
+import SEE.External;
+import java.util.Scanner;
+
+public class FinalMarks {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Allow the user to enter the number of students
+        System.out.print("Enter the number of students: ");
+        int n = scanner.nextInt();
+
+        Student[] students = new Student[n];
+        Internals[] internals = new Internals[n];
+        External[] externals = new External[n];
+
+        // Initialize students, internals, and externals
+        for (int i = 0; i < n; i++) {
+            students[i] = new Student();
+            System.out.print("Enter USN for student " + (i + 1) + ": ");
+            students[i].setUsn(scanner.next());
+
+            System.out.print("Enter name for student " + (i + 1) + ": ");
+            students[i].setName(scanner.next());
+
+            System.out.print("Enter semester for student " + (i + 1) + ": ");
+            students[i].setSem(scanner.nextInt());
+
+            internals[i] = new Internals();
+            // Assuming a simple method to input internal marks with validation
+            internals[i].setInternalMarks(inputMarksWithValidation("internal", i, scanner, 0, 50));
+
+            externals[i] = new External(students[i].getUsn(), students[i].getName(), students[i].getSem(), new int[5]);
+            // Assuming a simple method to input external marks with validation
+            externals[i].setSeeMarks(inputMarksWithValidation("external", i, scanner, 0, 100));
+
+            // Calculate final marks for the ith student and display
+            int[] finalMarks = new int[5];
+            for (int j = 0; j < 5; j++) {
+                finalMarks[j] = internals[i].getInternalMarks()[j] + externals[i].getSeeMarks()[j] / 2;
+            }
+
+            System.out.println("Student " + (i + 1) + " Final Marks: " +
+                    finalMarks[0] + ", " + finalMarks[1] + ", " + finalMarks[2] + ", " +
+                    finalMarks[3] + ", " + finalMarks[4]);
+        }
+
+        scanner.close();
+    }
+
+    private static int[] inputMarksWithValidation(String type, int studentIndex, Scanner scanner, int min, int max) {
+        int[] marks = new int[5];
+        System.out.println("Enter " + type + " marks for student " + (studentIndex + 1) + ": ");
+        for (int i = 0; i < 5; i++) {
+            int mark;
+            do {
+                System.out.print("Subject " + (i + 1) + ": ");
+                mark = scanner.nextInt();
+                if (mark < 0 || mark > max) {
+                    System.out.println("Invalid input. " + type + " marks should be between 0 and " + max + ". Please try again.");
+                }
+            } while (mark < 0 || mark > max);
+            marks[i] = mark;
+        }
+        return marks;
+    }
+}
